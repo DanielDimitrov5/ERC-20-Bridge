@@ -13,13 +13,13 @@ contract BridgeTest is Test {
 
     function setUp() public {
         DeployScript script = new DeployScript();
-        (bridge, token) = script.run(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266);
+        (bridge, token) = script.run(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266); // Anvil #1
 
         token.mint(address(this), 1000);
         token.approve(address(bridge), 1000);
     }
 
-    function test_RevertsOnInvalidData() public {
+    function test_LockRevertsOnInvalidData() public {
         vm.expectRevert(abi.encodeWithSelector(Bridge.Bridge__InvalidAmount.selector, 0));
         bridge.lock(address(1), 0, 1);
 
@@ -44,10 +44,21 @@ contract BridgeTest is Test {
         bridge.lock(address(token), 1000, 1337);
     }
 
+    function test_MintRevertsOnInvalidData() public {
+        vm.expectRevert(abi.encodeWithSelector(Bridge.Bridge__InvalidToken.selector));
+        bridge.mint(address(0), 1000, address(this), 0, hex"");
+
+        vm.expectRevert(abi.encodeWithSelector(Bridge.Bridge__InvalidRecepient.selector, address(0)));
+        bridge.mint(address(token), 1000, address(0), 0, hex"");
+
+        vm.expectRevert(abi.encodeWithSelector(Bridge.Bridge__InvalidAmount.selector, 0));
+        bridge.mint(address(token), 0, address(this), 0, hex"");
+    }
+
     function test_mint_recover() external {
         bytes memory signature =
-            hex"54ccad3ddac5ebfde477ad223d50a16e1e8d1b4e3d61ce36b5f1729a1dea97f37a4dc78d45ae00524d9203295023b86d8476293959846aa3b43212531ffbb5731c";
-        bridge.mint(address(token), 1e18, address(this), signature);
+            hex"7c4a32493653d40939102aa45d907bcb42f7bdd6a02df4817c852db3b136b42a6f41e0246ed87299cac0dc260f6d4d374d08472225183ce47d29a5db1e490e6d1b";
+        bridge.mint(address(token), 1e18, address(this), 0, signature);
 
         WERC20 w = bridge.wrappedTokens(address(token));
 
