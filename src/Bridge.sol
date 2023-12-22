@@ -7,7 +7,7 @@ import {WERC20} from "src/WERC.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import {IBridge} from "src/IBridge.sol";
-// import {console2} from "forge-std/console2.sol";
+import {console2} from "forge-std/console2.sol";
 
 contract Bridge is IBridge, Ownable {
     using ECDSA for bytes32;
