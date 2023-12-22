@@ -25,12 +25,12 @@ jobs:
       - name: Run Forge build
         run: |
           forge --version
-          forge build --sizes > build-output.txt
+          forge build --sizes > ci_outputs/build-output.txt
         id: build
 
       - name: Run Forge tests
         run: |
-          forge test -vvv > test-output.txt
+          forge test -vvv > ci_outputs/test-output.txt
         id: test
 
       - name: Commit results
