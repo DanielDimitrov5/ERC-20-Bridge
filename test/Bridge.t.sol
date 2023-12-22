@@ -7,7 +7,7 @@ import {Bridge} from "src/Bridge.sol";
 import {DeployScript} from "script/Deploy.s.sol";
 import {WERC20} from "src/WERC.sol";
 import {IBridge} from "src/IBridge.sol";
-// import {console2} from "forge-std/console2.sol";
+import {console2} from "forge-std/console2.sol";
 
 contract BridgeTest is Test {
     Bridge bridge;
