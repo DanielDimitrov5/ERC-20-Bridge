@@ -12,3 +12,6 @@ docs/
 
 # Dotenv file
 .env
+
+ci_outputs/build-ci_output.txt
+ci_outputs/test-output.txt
