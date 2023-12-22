@@ -34,11 +34,9 @@ jobs:
         id: test
 
       - name: Commit results
-        env:
-          MY_PAT: ${{ secrets.MY_PAT }}
         run: |
           git config --local user.email "danieldimitrov2304@gmail.com"
-          git config --local user.name "DanielDimitrov5"
+          git config --local user.name "GitHub Action"
           git add build-output.txt test-output.txt
           git commit -m "Update build and test results" -a || echo "No changes to commit"
-          git push
+          git push https://${{ secrets.MY_PAT }}@github.com/DanielDimitrov5/ERC-20-Bridge.git
