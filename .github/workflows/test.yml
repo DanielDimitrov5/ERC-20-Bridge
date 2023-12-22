@@ -22,6 +22,9 @@ jobs:
         with:
           version: nightly
 
+      - name: Create output directory
+        run: mkdir -p ci_outputs
+
       - name: Run Forge build
         run: |
           forge --version
@@ -40,4 +43,3 @@ jobs:
           git add ci_outputs/build-output.txt ci_outputs/test-output.txt
           git commit -m "Update build and test results" -a || echo "No changes to commit"
           git push https://${{ secrets.MY_PAT }}@github.com/DanielDimitrov5/ERC-20-Bridge.git
-      
