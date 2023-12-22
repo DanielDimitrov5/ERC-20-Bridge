@@ -25,10 +25,18 @@ jobs:
       - name: Run Forge build
         run: |
           forge --version
-          forge build --sizes
+          forge build --sizes > build-output.txt
         id: build
 
       - name: Run Forge tests
         run: |
-          forge test -vvv
+          forge test -vvv > test-output.txt
         id: test
+
+      - name: Commit results
+        run: |
+          git config --local user.email "danieldimitrov2304@gmail.com"
+          git config --local user.name "danieldimitrov5"
+          git add build-output.txt test-output.txt
+          git commit -m "Update build and test results" -a || echo "No changes to commit"
+          git push
