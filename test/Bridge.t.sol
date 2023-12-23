@@ -41,6 +41,16 @@ contract BridgeTest is Test {
         assertEq(token.balanceOf(address(bridge)), 1000);
     }
 
+    function test_LockBurnsWrappedTokens() public {
+        _mint_helper();
+
+        WERC20 w = bridge.wrappedTokens(address(token));
+        assertEq(w.balanceOf(address(this)), 1e18);
+
+        bridge.lock(IBridge.LockData(address(token), 1e18, 1));
+        assertEq(w.balanceOf(address(this)), 0);
+    }
+
     function test_LockEmitsEvent() public {
         vm.expectEmit();
 
@@ -64,26 +74,14 @@ contract BridgeTest is Test {
 
         vm.expectRevert(abi.encodeWithSelector(Bridge.Bridge__InvalidSignature.selector));
 
-        bytes memory fakeSignature = hex"7c4a32493653d40939102aa45d907bcb42f7bdd6a02df4817c852db3b136b42a6f41e0246ed87299cac0dc260f6d4d374d08472225183ce47d29a5db1e490e6d1b";
+        bytes memory fakeSignature =
+            hex"7c4a32493653d40939102aa45d907bcb42f7bdd6a02df4817c852db3b136b42a6f41e0246ed87299cac0dc260f6d4d374d08472225183ce47d29a5db1e490e6d1b";
 
-        bridge.mint(
-            IBridge.MintData(
-                address(token),
-                address(this),
-                1000,
-                0,
-                fakeSignature,
-                IBridge.WrapData("", "")
-            )
-        );
+        bridge.mint(IBridge.MintData(address(token), address(this), 1000, 0, fakeSignature, IBridge.WrapData("", "")));
     }
 
     function test_MintRecover() external {
-        bridge.mint(
-            IBridge.MintData(
-                address(token), address(this), 1e18, 0, SIGNATURE, IBridge.WrapData(token.name(), token.symbol())
-            )
-        );
+        _mint_helper();
 
         WERC20 w = bridge.wrappedTokens(address(token));
 
@@ -98,14 +96,42 @@ contract BridgeTest is Test {
         vm.expectEmit(false, true, true, false);
         emit Bridge.Mint(address(0x1), address(this), 1e18);
 
+        _mint_helper();
+    }
+
+    function test_BurnRevertsOnInvalidData() public {
+        vm.expectRevert(abi.encodeWithSelector(Bridge.Bridge__InvalidToken.selector));
+        bridge.burn(address(0), 1000);
+
+        vm.expectRevert(abi.encodeWithSelector(Bridge.Bridge__InvalidAmount.selector, 0));
+        bridge.burn(address(token), 0);
+    }
+
+    function test_Burn() public {
+        _mint_helper();
+
+        WERC20 w = bridge.wrappedTokens(address(token));
+
+        assertEq(w.balanceOf(address(this)), 1e18);
+
+        bridge.burn(address(token), 1e18 / 2);
+
+        assertEq(w.balanceOf(address(this)), 1e18 / 2);
+    }
+
+    function test_BurnEmitsEvent() public {
+        _mint_helper();
+
+        vm.expectEmit(true, true, true, false);
+        emit Bridge.Burn(address(token), address(this), 1e18 / 2);
+
+        bridge.burn(address(token), 1e18 / 2);
+    }
+
+    function _mint_helper() internal {
         bridge.mint(
             IBridge.MintData(
-                address(token),
-                address(this),
-                1e18,
-                0,
-                SIGNATURE,
-                IBridge.WrapData(token.name(), token.symbol())
+                address(token), address(this), 1e18, 0, SIGNATURE, IBridge.WrapData(token.name(), token.symbol())
             )
         );
     }

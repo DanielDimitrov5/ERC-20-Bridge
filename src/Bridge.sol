@@ -29,22 +29,14 @@ contract Bridge is IBridge, Ownable {
         ADMIN = admin;
     }
 
-    modifier validateLock(
-        address token,
-        uint256 amount,
-        uint256 chainId
-    ) {
+    modifier validateLock(address token, uint256 amount, uint256 chainId) {
         if (token == address(0)) revert Bridge__InvalidToken();
         if (amount == 0) revert Bridge__InvalidAmount(amount);
         if (chainId == 0) revert Bridge__InvalidChainId(chainId);
         _;
     }
 
-    modifier validateMint(
-        address token,
-        uint256 amount,
-        address to
-    ) {
+    modifier validateMint(address token, uint256 amount, address to) {
         if (token == address(0)) revert Bridge__InvalidToken();
         if (amount == 0) revert Bridge__InvalidAmount(amount);
         if (to == address(0)) revert Bridge__InvalidRecepient(to);
@@ -52,32 +44,31 @@ contract Bridge is IBridge, Ownable {
     }
 
     event Lock(
-        address indexed token,
-        address indexed sender,
-        uint256 amount,
-        uint256 indexed chainId,
-        WrapData wrapData
+        address indexed token, address indexed sender, uint256 amount, uint256 indexed chainId, WrapData wrapData
     );
-    event TokenWrapped(
-        address indexed originalToken,
-        address indexed wrappedToken
-    );
+    event TokenWrapped(address indexed originalToken, address indexed wrappedToken);
     event Mint(address indexed token, address indexed to, uint256 amount);
+    event Burn(address indexed token, address indexed from, uint256 amount);
 
-    function lock(
-        LockData calldata _lockData
-    ) external validateLock(_lockData.token, _lockData.amount, _lockData.chainId) {
+    function lock(LockData calldata _lockData)
+        external
+        validateLock(_lockData.token, _lockData.amount, _lockData.chainId)
+    {
         address token = _lockData.token;
         uint256 amount = _lockData.amount;
         uint256 chainId = _lockData.chainId;
 
-        ERC20(token).transferFrom(msg.sender, address(this), amount);
+        WERC20 wrappedToken = wrappedTokens[token];
+        if (wrappedToken != WERC20(address(0))) {
+            wrappedToken.burn(msg.sender, amount);
+        } else {
+            ERC20(token).transferFrom(msg.sender, address(this), amount);
+        }
+
         emit Lock(token, msg.sender, amount, chainId, WrapData(ERC20(token).name(), ERC20(token).symbol()));
     }
 
-    function mint(
-        MintData calldata _mintData
-    ) external validateMint(_mintData.token, _mintData.amount, _mintData.to) {
+    function mint(MintData calldata _mintData) external validateMint(_mintData.token, _mintData.amount, _mintData.to) {
         address originalToken = _mintData.token;
         address to = _mintData.to;
         uint256 amount = _mintData.amount;
@@ -87,9 +78,7 @@ contract Bridge is IBridge, Ownable {
         if (nonces[to] != nonce) {
             revert Bridge__InvalidNonce(nonce);
         }
-        bytes32 messageHash = keccak256(
-            abi.encodePacked(originalToken, to, amount, block.chainid, nonce)
-        );
+        bytes32 messageHash = keccak256(abi.encodePacked(originalToken, to, amount, block.chainid, nonce));
         bytes32 ethSignedMessageHash = messageHash.toEthSignedMessageHash();
 
         address signer = ethSignedMessageHash.recover(signature);
@@ -109,10 +98,21 @@ contract Bridge is IBridge, Ownable {
         emit Mint(address(wrappedToken), to, amount);
     }
 
+    function burn(address token, uint256 amount) external {
+        if (amount == 0) revert Bridge__InvalidAmount(amount);
+
+        WERC20 wrappedToken = wrappedTokens[token];
+        if (address(wrappedToken) == address(0)) {
+            revert Bridge__InvalidToken();
+        }
+
+        wrappedToken.burn(msg.sender, amount);
+
+        emit Burn(token, msg.sender, amount);
+    }
+
     function _wrapToken(WrapData calldata _wrapData, address token) internal {
-        string memory name = string(
-            abi.encodePacked("Wrapped ", _wrapData.name)
-        );
+        string memory name = string(abi.encodePacked("Wrapped ", _wrapData.name));
         string memory symbol = string(abi.encodePacked("w", _wrapData.symbol));
         WERC20 wrappedToken = new WERC20(name, symbol);
         wrappedTokens[token] = wrappedToken;
