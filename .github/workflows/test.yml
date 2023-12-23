@@ -43,4 +43,4 @@ jobs:
           git config advice.addIgnoredFile false  
           git add ci_outputs/build-output.txt ci_outputs/test-output.txt
           git commit -m "Update build and test results" -a || echo "No changes to commit"
-          git push https://${{ secrets.MY_PAT }}@github.com/DanielDimitrov5/ERC-20-Bridge.git
+          git push https://@github.com/DanielDimitrov5/ERC-20-Bridge.git
