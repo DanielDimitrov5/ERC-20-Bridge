@@ -8,6 +8,11 @@ interface IBridge {
         MintData calldata data
     ) external;
 
+    function burn(
+        address token,
+        uint256 amount
+    ) external;
+
     struct LockData {
         address token;
         uint256 amount;

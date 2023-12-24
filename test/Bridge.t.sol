@@ -103,6 +103,8 @@ contract BridgeTest is Test {
         vm.expectRevert(abi.encodeWithSelector(Bridge.Bridge__InvalidToken.selector));
         bridge.burn(address(0), 1000);
 
+        _mint_helper();
+
         vm.expectRevert(abi.encodeWithSelector(Bridge.Bridge__InvalidAmount.selector, 0));
         bridge.burn(address(token), 0);
     }

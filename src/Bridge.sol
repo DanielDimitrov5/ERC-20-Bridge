@@ -43,6 +43,12 @@ contract Bridge is IBridge, Ownable {
         _;
     }
 
+    modifier validateBurn(address token, uint256 amount) {
+        if (address(wrappedTokens[token]) == address(0)) revert Bridge__InvalidToken();
+        if (amount == 0) revert Bridge__InvalidAmount(amount);
+        _;
+    }
+
     event Lock(
         address indexed token, address indexed sender, uint256 amount, uint256 indexed chainId, WrapData wrapData
     );
@@ -65,7 +71,13 @@ contract Bridge is IBridge, Ownable {
             ERC20(token).transferFrom(msg.sender, address(this), amount);
         }
 
-        emit Lock(token, msg.sender, amount, chainId, WrapData(ERC20(token).name(), ERC20(token).symbol()));
+        emit Lock(token, msg.sender, amount, chainId, WrapData(WERC20(token).name(), WERC20(token).symbol()));
+    }
+
+    function release(address token, address to, uint256 amount, uint256 nonce, bytes calldata signature)
+        external
+    {
+        
     }
 
     function mint(MintData calldata _mintData) external validateMint(_mintData.token, _mintData.amount, _mintData.to) {
@@ -98,13 +110,8 @@ contract Bridge is IBridge, Ownable {
         emit Mint(address(wrappedToken), to, amount);
     }
 
-    function burn(address token, uint256 amount) external {
-        if (amount == 0) revert Bridge__InvalidAmount(amount);
-
+    function burn(address token, uint256 amount) external validateBurn(token, amount) {
         WERC20 wrappedToken = wrappedTokens[token];
-        if (address(wrappedToken) == address(0)) {
-            revert Bridge__InvalidToken();
-        }
 
         wrappedToken.burn(msg.sender, amount);
 
