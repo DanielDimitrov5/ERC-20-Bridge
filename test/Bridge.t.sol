@@ -51,6 +51,11 @@ contract BridgeTest is Test {
         assertEq(w.balanceOf(address(this)), 0);
     }
 
+    function test_LockUpdatesUserBalances() public {
+        bridge.lock(IBridge.LockData(address(token), 1000, 1));
+        assertEq(bridge.balances(address(this), address(token)), 1000);
+    }  
+
     function test_LockEmitsEvent() public {
         vm.expectEmit();
 
@@ -89,6 +94,12 @@ contract BridgeTest is Test {
         assertEq(bridge.nonces(address(this)), 1);
     }
 
+    function test_MintUpdatesUserBalances() external {
+        _mint_helper();
+
+        assertEq(bridge.balances(address(this), address(token)), 1e18);
+    }
+
     function test_MintEmitsEvents() external {
         vm.expectEmit(true, false, false, false);
         emit Bridge.TokenWrapped(address(token), address(0x1));
@@ -119,6 +130,14 @@ contract BridgeTest is Test {
         bridge.burn(address(token), 1e18 / 2);
 
         assertEq(w.balanceOf(address(this)), 1e18 / 2);
+    }
+
+    function test_BurnUpdatesUserBalances() public {
+        _mint_helper();
+
+        bridge.burn(address(token), 1e18 / 2);
+
+        assertEq(bridge.balances(address(this), address(token)), 1e18 / 2);
     }
 
     function test_BurnEmitsEvent() public {

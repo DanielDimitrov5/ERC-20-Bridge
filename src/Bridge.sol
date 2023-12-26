@@ -22,8 +22,10 @@ contract Bridge is IBridge, Ownable {
     error Bridge__InvalidRecepient(address recepient);
 
     address public immutable ADMIN;
+
     mapping(address originalToken => WERC20 wrappedToken) public wrappedTokens;
     mapping(address user => uint256 nonce) public nonces;
+    mapping(address user => mapping (address token => uint256 amount)) public balances;
 
     constructor(address admin) Ownable(msg.sender) {
         ADMIN = admin;
@@ -36,10 +38,15 @@ contract Bridge is IBridge, Ownable {
         _;
     }
 
-    modifier validateMint(address token, uint256 amount, address to) {
+    modifier validateRelease(address token, address to, uint256 amount, uint256 nonce) {
+        _;
+    }
+
+    modifier validateMint(address token, uint256 amount, address to, uint256 nonce) {
         if (token == address(0)) revert Bridge__InvalidToken();
         if (amount == 0) revert Bridge__InvalidAmount(amount);
         if (to == address(0)) revert Bridge__InvalidRecepient(to);
+        if (nonces[to] != nonce) revert Bridge__InvalidNonce(nonce);
         _;
     }
 
@@ -65,31 +72,31 @@ contract Bridge is IBridge, Ownable {
         uint256 chainId = _lockData.chainId;
 
         WERC20 wrappedToken = wrappedTokens[token];
-        if (wrappedToken != WERC20(address(0))) {
+        if (wrappedToken != ERC20(address(0))) {
             wrappedToken.burn(msg.sender, amount);
+            balances[msg.sender][token] -= amount;
         } else {
             ERC20(token).transferFrom(msg.sender, address(this), amount);
+            balances[msg.sender][token] += amount;
         }
 
-        emit Lock(token, msg.sender, amount, chainId, WrapData(WERC20(token).name(), WERC20(token).symbol()));
+        emit Lock(token, msg.sender, amount, chainId, WrapData(ERC20(token).name(), ERC20(token).symbol()));
     }
 
-    function release(address token, address to, uint256 amount, uint256 nonce, bytes calldata signature)
+    function release(ReleaseData calldata _releaseData) external {
+
+    }
+
+    function mint(MintData calldata _mintData)
         external
+        validateMint(_mintData.token, _mintData.amount, _mintData.to, _mintData.nonce)
     {
-        
-    }
-
-    function mint(MintData calldata _mintData) external validateMint(_mintData.token, _mintData.amount, _mintData.to) {
         address originalToken = _mintData.token;
         address to = _mintData.to;
         uint256 amount = _mintData.amount;
         uint256 nonce = _mintData.nonce;
         bytes memory signature = _mintData.signature;
 
-        if (nonces[to] != nonce) {
-            revert Bridge__InvalidNonce(nonce);
-        }
         bytes32 messageHash = keccak256(abi.encodePacked(originalToken, to, amount, block.chainid, nonce));
         bytes32 ethSignedMessageHash = messageHash.toEthSignedMessageHash();
 
@@ -107,6 +114,8 @@ contract Bridge is IBridge, Ownable {
         }
 
         wrappedToken.mint(to, amount);
+        balances[to][originalToken] += amount;
+
         emit Mint(address(wrappedToken), to, amount);
     }
 
@@ -114,6 +123,7 @@ contract Bridge is IBridge, Ownable {
         WERC20 wrappedToken = wrappedTokens[token];
 
         wrappedToken.burn(msg.sender, amount);
+        balances[msg.sender][token] -= amount;
 
         emit Burn(token, msg.sender, amount);
     }
