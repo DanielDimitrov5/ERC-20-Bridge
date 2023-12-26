@@ -1,0 +1,16 @@
+No files changed, compilation skipped
+
+Running 10 tests for test/Bridge.t.sol:BridgeTest
+[32m[PASS][0m test_Burn() (gas: 708775)
+[32m[PASS][0m test_BurnEmitsEvent() (gas: 710257)
+[32m[PASS][0m test_BurnRevertsOnInvalidData() (gas: 707047)
+[32m[PASS][0m test_Lock() (gas: 53458)
+[32m[PASS][0m test_LockBurnsWrappedTokens() (gas: 676228)
+[32m[PASS][0m test_LockEmitsEvent() (gas: 60005)
+[32m[PASS][0m test_LockRevertsOnInvalidData() (gas: 13496)
+[32m[PASS][0m test_MintEmitsEvents() (gas: 705392)
+[32m[PASS][0m test_MintRecover() (gas: 701879)
+[32m[PASS][0m test_MintRevertsOnInvalidData() (gas: 36518)
+Test result: [32mok[0m. [32m10[0m passed; [31m0[0m failed; [33m0[0m skipped; finished in 2.73ms
+ 
+Ran 1 test suites: [32m10[0m tests passed, [31m0[0m failed, [33m0[0m skipped (10 total tests)
