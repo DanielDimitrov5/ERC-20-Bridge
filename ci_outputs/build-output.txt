@@ -1,11 +1,11 @@
 installing solc version "0.8.23"
 Successfully installed solc 0.8.23
 Compiling 38 files with 0.8.23
-Solc 0.8.23 finished in 4.60s
+Solc 0.8.23 finished in 4.50s
 Compiler run [32msuccessful![0m
 | Contract         | Size (kB) | Margin (kB) |
 |------------------|-----------|-------------|
-| Bridge           | 7.883     | 16.693      |
+| Bridge           | 8.189     | 16.387      |
 | BridgeCoin       | 1.925     | 22.651      |
 | ECDSA            | 0.086     | 24.49       |
 | Math             | 0.086     | 24.49       |
