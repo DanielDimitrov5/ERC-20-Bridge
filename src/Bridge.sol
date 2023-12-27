@@ -25,7 +25,7 @@ contract Bridge is IBridge, Ownable {
 
     mapping(address originalToken => WERC20 wrappedToken) public wrappedTokens;
     mapping(address user => uint256 nonce) public nonces;
-    mapping(address user => mapping (address token => uint256 amount)) public balances;
+    mapping(address user => mapping(address token => uint256 amount)) public balances;
 
     constructor(address admin) Ownable(msg.sender) {
         ADMIN = admin;
@@ -39,6 +39,10 @@ contract Bridge is IBridge, Ownable {
     }
 
     modifier validateRelease(address token, address to, uint256 amount, uint256 nonce) {
+        if (token == address(0)) revert Bridge__InvalidToken();
+        if(to == address(0)) revert Bridge__InvalidRecepient(to);
+        if (balances[to][token] < amount || amount == 0) revert Bridge__InvalidAmount(amount);
+        if (nonces[to] != nonce) revert Bridge__InvalidNonce(nonce);
         _;
     }
 
@@ -59,6 +63,7 @@ contract Bridge is IBridge, Ownable {
     event Lock(
         address indexed token, address indexed sender, uint256 amount, uint256 indexed chainId, WrapData wrapData
     );
+    event Release(address indexed token, address indexed to, uint256 amount);
     event TokenWrapped(address indexed originalToken, address indexed wrappedToken);
     event Mint(address indexed token, address indexed to, uint256 amount);
     event Burn(address indexed token, address indexed from, uint256 amount);
@@ -83,8 +88,29 @@ contract Bridge is IBridge, Ownable {
         emit Lock(token, msg.sender, amount, chainId, WrapData(ERC20(token).name(), ERC20(token).symbol()));
     }
 
-    function release(ReleaseData calldata _releaseData) external {
+    function release(ReleaseData calldata _releaseData) external validateRelease(
+        _releaseData.token, _releaseData.to, _releaseData.amount, _releaseData.nonce
+    ) {
+        address originalToken = _releaseData.token;
+        address to = _releaseData.to;
+        uint256 amount = _releaseData.amount;
+        uint256 nonce = _releaseData.nonce;
+        bytes memory signature = _releaseData.signature;
 
+        bytes32 messageHash = keccak256(abi.encodePacked(originalToken, to, amount, nonce));
+        bytes32 ethSignedMessageHash = messageHash.toEthSignedMessageHash();
+
+        address signer = ethSignedMessageHash.recover(signature);
+        if (signer != ADMIN) {
+            revert Bridge__InvalidSignature();
+        }
+
+        nonces[to]++;
+
+        balances[to][originalToken] -= amount;
+        ERC20(originalToken).transfer(to, amount);
+
+        emit Release(originalToken, to, amount);
     }
 
     function mint(MintData calldata _mintData)
