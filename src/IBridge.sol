@@ -30,6 +30,7 @@ interface IBridge {
         uint256 amount;
         uint256 nonce;
         bytes signature;
+        uint256 sourceChainId;
         WrapData wrapData;
     }
 

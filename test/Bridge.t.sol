@@ -47,12 +47,13 @@ contract BridgeTest is Test {
         _mint_helper();
 
         WERC20 w = bridge.wrappedTokens(address(token));
+        w.approve(address(bridge), 1e18);
         assertEq(w.balanceOf(address(this)), 1e18);
 
-        bridge.lock(IBridge.LockData(address(token), 1e18, 1));
+        bridge.lock(IBridge.LockData(address(w), 1e18, 1));
         assertEq(w.balanceOf(address(this)), 0);
     }
-
+  
     function test_LockUpdatesUserBalances() public {
         bridge.lock(IBridge.LockData(address(token), 1000, 1));
         assertEq(bridge.balances(address(this), address(token)), 1000);
@@ -68,23 +69,23 @@ contract BridgeTest is Test {
 
     function test_MintRevertsOnInvalidData() public {
         vm.expectRevert(abi.encodeWithSelector(Bridge.Bridge__InvalidToken.selector));
-        bridge.mint(IBridge.MintData(address(0), address(this), 1000, 0, hex"", IBridge.WrapData("", "")));
+        bridge.mint(IBridge.MintData(address(0), address(this), 1000, 0, hex"", 1,IBridge.WrapData("", "")));
 
         vm.expectRevert(abi.encodeWithSelector(Bridge.Bridge__InvalidRecepient.selector, address(0)));
-        bridge.mint(IBridge.MintData(address(token), address(0), 1000, 0, hex"", IBridge.WrapData("", "")));
+        bridge.mint(IBridge.MintData(address(token), address(0), 1000, 0, hex"", 1,IBridge.WrapData("", "")));
 
         vm.expectRevert(abi.encodeWithSelector(Bridge.Bridge__InvalidAmount.selector, 0));
-        bridge.mint(IBridge.MintData(address(token), address(this), 0, 0, hex"", IBridge.WrapData("", "")));
+        bridge.mint(IBridge.MintData(address(token), address(this), 0, 0, hex"", 1,IBridge.WrapData("", "")));
 
         vm.expectRevert(abi.encodeWithSelector(Bridge.Bridge__InvalidNonce.selector, 5));
-        bridge.mint(IBridge.MintData(address(token), address(this), 1000, 5, hex"", IBridge.WrapData("", "")));
+        bridge.mint(IBridge.MintData(address(token), address(this), 1000, 5, hex"", 1,IBridge.WrapData("", "")));
 
         vm.expectRevert(abi.encodeWithSelector(Bridge.Bridge__InvalidSignature.selector));
 
         bytes memory fakeSignature =
             hex"350b8dac6767f3a128eb8d417688134816c3bc4ae285c81a61110e25ff6aff2a45b6c5b29205e10284e93a2997c14506cde233298f1b4212454b2cded9ccef1b1c";
 
-        bridge.mint(IBridge.MintData(address(token), address(this), 1000, 0, fakeSignature, IBridge.WrapData("", "")));
+        bridge.mint(IBridge.MintData(address(token), address(this), 1000, 0, fakeSignature, 1,IBridge.WrapData("", "")));
     }
 
     function test_MintMintsTokens() external {
@@ -210,7 +211,7 @@ contract BridgeTest is Test {
     function _mint_helper() internal {
         bridge.mint(
             IBridge.MintData(
-                address(token), address(this), 1e18, 0, MINT_SIGNATURE, IBridge.WrapData(token.name(), token.symbol())
+                address(token), address(this), 1e18, 0, MINT_SIGNATURE, 1,IBridge.WrapData(token.name(), token.symbol())
             )
         );
     }
