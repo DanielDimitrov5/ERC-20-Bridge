@@ -1,0 +1,23 @@
+No files changed, compilation skipped
+
+Running 17 tests for test/Bridge.t.sol:BridgeTest
+[32m[PASS][0m test_Burn() (gas: 754884)
+[32m[PASS][0m test_BurnEmitsEvent() (gas: 756398)
+[32m[PASS][0m test_BurnRevertsOnInvalidData() (gas: 752681)
+[32m[PASS][0m test_BurnUpdatesUserBalances() (gas: 752893)
+[32m[PASS][0m test_LockBurnsWrappedTokens() (gas: 794429)
+[32m[PASS][0m test_LockEmitsEvent() (gas: 92016)
+[32m[PASS][0m test_LockLocksAssets() (gas: 85407)
+[32m[PASS][0m test_LockRevertsOnInvalidData() (gas: 13475)
+[32m[PASS][0m test_LockUpdatesUserBalances() (gas: 85627)
+[32m[PASS][0m test_MintEmitsEvents() (gas: 751036)
+[32m[PASS][0m test_MintMintsTokens() (gas: 747713)
+[32m[PASS][0m test_MintRevertsOnInvalidData() (gas: 36481)
+[32m[PASS][0m test_MintUpdatesUserBalances() (gas: 745617)
+[32m[PASS][0m test_ReleaseEmitsEvent() (gas: 95860)
+[32m[PASS][0m test_ReleaseRecover() (gas: 91936)
+[32m[PASS][0m test_ReleaseReleasesAssets() (gas: 97756)
+[32m[PASS][0m test_ReleaseRevertsOnInvalidData() (gas: 101198)
+Test result: [32mok[0m. [32m17[0m passed; [31m0[0m failed; [33m0[0m skipped; finished in 4.85ms
+ 
+Ran 1 test suites: [32m17[0m tests passed, [31m0[0m failed, [33m0[0m skipped (17 total tests)
