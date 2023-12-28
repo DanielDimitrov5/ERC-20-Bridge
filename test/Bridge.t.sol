@@ -2,7 +2,7 @@
 pragma solidity 0.8.23;
 
 import {Test} from "forge-std/Test.sol";
-import {BridgeCoin} from "src/BridgeCoin.sol";
+import {BridgeCoin} from "test/MockTokens/BridgeCoin.sol";
 import {Bridge} from "src/Bridge.sol";
 import {DeployScript} from "script/Deploy.s.sol";
 import {WERC20} from "src/WERC20.sol";
