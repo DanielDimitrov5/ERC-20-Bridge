@@ -1,7 +1,7 @@
 installing solc version "0.8.23"
 Successfully installed solc 0.8.23
 Compiling 39 files with 0.8.23
-Solc 0.8.23 finished in 5.10s
+Solc 0.8.23 finished in 5.08s
 Compiler run [32msuccessful![0m
 | Contract         | Size (kB) | Margin (kB) |
 |------------------|-----------|-------------|
