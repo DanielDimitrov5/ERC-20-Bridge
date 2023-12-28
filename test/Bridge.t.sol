@@ -53,7 +53,7 @@ contract BridgeTest is Test {
         bridge.lock(IBridge.LockData(address(w), 1e18, 1));
         assertEq(w.balanceOf(address(this)), 0);
     }
-  
+
     function test_LockUpdatesUserBalances() public {
         bridge.lock(IBridge.LockData(address(token), 1000, 1));
         assertEq(bridge.balances(address(this), address(token)), 1000);

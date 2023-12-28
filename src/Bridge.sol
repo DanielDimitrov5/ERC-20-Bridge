@@ -25,6 +25,7 @@ contract Bridge is IBridge, Ownable {
     address public immutable ADMIN;
 
     mapping(address originalToken => WERC20 wrappedToken) public wrappedTokens;
+    mapping(address wrappedToken => address originalToken) public originalTokens;
     mapping(address user => uint256 nonce) public nonces;
     mapping(address user => mapping(address token => uint256 amount)) public balances;
 
@@ -77,10 +78,11 @@ contract Bridge is IBridge, Ownable {
         uint256 amount = _lockData.amount;
         uint256 chainId = _lockData.chainId;
 
-        WERC20 wrappedToken = wrappedTokens[token]; // TODO: fix logic
-        if (wrappedToken != WERC20(address(0))) {
+        address originalToken = originalTokens[token];
+        if (originalToken != address(0)) {
+            WERC20 wrappedToken = wrappedTokens[originalToken];
             wrappedToken.burn(msg.sender, amount);
-            balances[msg.sender][token] -= amount;
+            balances[msg.sender][originalToken] -= amount;
         } else {
             bool isSuccess = ERC20(token).transferFrom(msg.sender, address(this), amount);
 
@@ -168,6 +170,7 @@ contract Bridge is IBridge, Ownable {
 
         WERC20 wrappedToken = new WERC20(name, symbol, _token, _sourceChainId);
         wrappedTokens[_token] = wrappedToken;
+        originalTokens[address(wrappedToken)] = _token;
         emit TokenWrapped(_token, address(wrappedToken));
     }
 }
