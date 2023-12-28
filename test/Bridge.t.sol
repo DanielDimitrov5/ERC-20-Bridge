@@ -5,7 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {BridgeCoin} from "src/BridgeCoin.sol";
 import {Bridge} from "src/Bridge.sol";
 import {DeployScript} from "script/Deploy.s.sol";
-import {WERC20} from "src/WERC.sol";
+import {WERC20} from "src/WERC20.sol";
 import {IBridge} from "src/IBridge.sol";
 import {console2} from "forge-std/console2.sol";
 

@@ -60,4 +60,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 [Daniel Dimitrov](https://linktr.ee/danithedev)
 
+![#](https://via.placeholder.com/150/000000/FFFFFF/?text=Dark)
+![#](https://via.placeholder.com/150/FFFFFF/000000/?text=Light)
+
 ---
