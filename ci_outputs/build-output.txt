@@ -1,0 +1,27 @@
+installing solc version "0.8.23"
+Successfully installed solc 0.8.23
+Compiling 39 files with 0.8.23
+Solc 0.8.23 finished in 5.20s
+Compiler run [32msuccessful![0m
+| Contract         | Size (kB) | Margin (kB) |
+|------------------|-----------|-------------|
+| Bridge           | 9.62      | 14.956      |
+| BridgeCoin       | 1.925     | 22.651      |
+| ECDSA            | 0.086     | 24.49       |
+| Math             | 0.086     | 24.49       |
+| MessageHashUtils | 0.086     | 24.49       |
+| MockERC20        | 3.69      | 20.886      |
+| MockERC721       | 3.827     | 20.749      |
+| SignedMath       | 0.086     | 24.49       |
+| StdStyle         | 0.086     | 24.49       |
+| Strings          | 0.086     | 24.49       |
+| WERC20           | 2.477     | 22.099      |
+| console          | 0.086     | 24.49       |
+| console2         | 0.086     | 24.49       |
+| safeconsole      | 0.086     | 24.49       |
+| stdError         | 0.592     | 23.984      |
+| stdJson          | 0.086     | 24.49       |
+| stdMath          | 0.086     | 24.49       |
+| stdStorage       | 0.086     | 24.49       |
+| stdStorageSafe   | 0.086     | 24.49       |
+
