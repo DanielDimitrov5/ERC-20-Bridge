@@ -3,7 +3,7 @@
 # Blockchain Bridge Contracts
 ![Test Status](https://github.com/DanielDimitrov5/ERC-20-Bridge/actions/workflows/test.yml/badge.svg)
 
-This repository contains a Solidity smart contracts for a blockchain bridge, developed with Foundry. The bridge enables the transfer of tokens between different blockchain networks while maintaining a constant supply of assets across chains. It relies on a centralized backend to listen for events and generate the required signatures for user operations.
+This repository contains a Solidity smart contracts for a blockchain bridge, developed with Foundry. The bridge enables the transfer of tokens between different blockchain networks while maintaining a constant supply of assets across chains. It relies on a [centralized backend](https://github.com/DanielDimitrov5/ERC-20-Bridge-Signatures) to listen for events and generate the required signatures for user operations.
 
 ## Overview
 
